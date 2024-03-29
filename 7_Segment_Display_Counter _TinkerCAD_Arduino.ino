@@ -1,3 +1,12 @@
+/*** header block ***
+ * code file name: 7_Display_Segment_Counter_TinkerCAD_Arduino
+ * code description: Program that displays the digits 0-9 on a seven-segment display as a button is pushed 
+ * Development Board Used: Arduino UNO 
+ * programmer(s) name: Frederick De Leon
+ * date when code is created/modified: 4/2/2022
+ * code version: v1.0 
+ ***/
+
 #define LEDpin 13
 #define USER_BUTTON 2
 
