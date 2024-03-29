@@ -1,0 +1,206 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2019 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "mbed.h"
+
+DigitalOut led(LED1);              // same as D13 or PA_5
+DigitalIn  mybutton(USER_BUTTON);  // same as        PC_13
+
+Ticker timers_interrupt;//name your interrupt
+
+unsigned int timer1; // dp LED timer used to blink dp in 7-segment
+unsigned int timer2; // timer used for up counter in 7-segment display
+
+//variable to control state of 7-segment display
+// 0,1,2,3,4,5,6,7,8,9
+unsigned int display_state;
+
+void init_function(void);
+void control_function(void);
+void dp_led_control(void);
+void display_control(void);
+void timers(void);
+void display_character_0(void) //displays 0 in a seven segment LED display (0 turns LED on and 1 turns LED off)
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,0);
+    DigitalOut(D12,0);
+    DigitalOut(D6,0);
+    DigitalOut(D11,1);
+}
+void display_character_1(void) //displays 1 in a seven segment LED display 
+{
+    DigitalOut(D5,1);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,1);
+    DigitalOut(D12,1);
+    DigitalOut(D6,1);
+    DigitalOut(D11,1);
+}
+void display_character_2(void) //displays 2 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,1);
+    DigitalOut(D13,0);
+    DigitalOut(D12,0);
+    DigitalOut(D6,1);
+    DigitalOut(D11,0);
+}
+void display_character_3(void) //displays 3 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,0);
+    DigitalOut(D12,1);
+    DigitalOut(D6,1);
+    DigitalOut(D11,0);   
+}
+void display_character_4(void) //displays 4 in a seven segment LED display 
+{
+    DigitalOut(D5,1);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,1);
+    DigitalOut(D12,1);
+    DigitalOut(D6,0);
+    DigitalOut(D11,0);
+}
+void display_character_5(void) //displays 5 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,1);
+    DigitalOut(D14,0);
+    DigitalOut(D13,0);
+    DigitalOut(D12,1);
+    DigitalOut(D6,0);
+    DigitalOut(D11,0);
+}
+void display_character_6(void) //displays 6 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,1);
+    DigitalOut(D14,0);
+    DigitalOut(D13,0);
+    DigitalOut(D12,0);
+    DigitalOut(D6,0);
+    DigitalOut(D11,0);
+}
+void display_character_7(void) //displays 7 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,1);
+    DigitalOut(D12,1);
+    DigitalOut(D6,1);
+    DigitalOut(D11,1);
+}
+void display_character_8(void) //displays 8 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,0);
+    DigitalOut(D12,0);
+    DigitalOut(D6,0);
+    DigitalOut(D11,0);
+}
+void display_character_9(void) //displays 9 in a seven segment LED display 
+{
+    DigitalOut(D5,0);
+    DigitalOut(D8,0);
+    DigitalOut(D14,0);
+    DigitalOut(D13,1);
+    DigitalOut(D12,1);
+    DigitalOut(D6,0);
+    DigitalOut(D11,0);
+}
+
+int main(void) // main function contains init function and a while loop for the DP led and display control functions
+{
+    init_function(); // equivelant to arduino "setup()"
+    while(1) // equivelant to arduino "loop()"
+    {
+        dp_led_control();
+        display_control();
+    }
+    return 1;
+}
+
+void init_function(void) //initializes timer interrupt
+{
+    printf("Setting up device\n");
+    timers_interrupt.attach(&timers, 0.1); //call this interrupt every 0.1s
+    printf("starting...\n");
+}
+
+void dp_led_control(void) //controls the blinking of the decimal point (DP) led in the display 
+{
+   if (timer1 < 2) 
+   {
+        DigitalOut(D15,0); //blinks DP on 
+    }
+    
+    else if (timer1 < 5)
+    {
+        DigitalOut(D15,1); //blinks DP off
+    }
+    else 
+        timer1 = 0; 
+}
+
+void display_control(void) // controls the LEDs on the display 
+{
+    if(mybutton == 1) 
+    {//button is not pressed
+        timer2 = 0;
+    }
+
+    if(timer2 > 9) 
+    {
+        timer2 = 0;
+        if(display_state < 9) //increments value of display state up if less than 9 
+            display_state++;
+        else //otherwise display state will equal 0 
+            display_state = 0;
+    }
+
+    //control the segments based on display_state 
+
+    if(display_state == 0) 
+        display_character_0(); 
+    else if(display_state == 1)
+        display_character_1();
+    else if(display_state == 2)
+        display_character_2();
+    else if(display_state == 2)
+        display_character_2();
+    else if(display_state == 3)
+        display_character_3();
+    else if(display_state == 4)
+        display_character_4();
+    else if(display_state == 5)
+        display_character_5();
+    else if(display_state == 6)
+        display_character_6();
+    else if(display_state == 7)
+        display_character_7();
+    else if(display_state == 8)
+        display_character_8();
+    else if(display_state == 9)
+        display_character_9();
+  
+}
+
+void timers() // timers 
+{
+    timer1++;
+    timer2++;
+}
