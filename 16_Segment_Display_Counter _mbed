@@ -1,3 +1,12 @@
+/*** header block ***
+ * code file name: 16_Display_Segment_Counter_mbed
+ * code description: Program that displays the digits 0-9 on a sixteen-segment display as a button is pushed using a Nucleo-64 board and mbed
+ * Development Board Used: STM32 Nucleo-64 with STM32F411RE MCU
+ * programmer(s) name: Frederick De Leon
+ * date when code is created/modified: 4/2/2022
+ * code version: v1.0 
+ ***/
+
 /* mbed Microcontroller Library
  * Copyright (c) 2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
